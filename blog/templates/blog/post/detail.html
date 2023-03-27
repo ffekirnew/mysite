@@ -3,7 +3,40 @@
 {% block content %}
 <h1>{{ post.title }}</h1>
 <p class="date">
-Published {{ post.publish }} by {{ post.author }}
+    Published {{ post.publish }} by {{ post.author }}
 </p>
+{% if post.tags.all %}
+    <p class="tags">Tags: {{ post.tags.all|join:", " }}</p>
+{% endif %}
+<!-- Display a link to share the post. -->
+<a href="{{ post.get_absolute_url }}share">Share the post.</a>
 {{ post.body|linebreaks }}
+
+<!--Display the number of comments for the specific post till date.-->
+{% with comments.count as total_comments %}
+<h2>
+    {{ total_comments }} comment{{ total_comments|pluralize }}
+</h2>
+{% endwith %}
+
+<!--Display comments for the specific blog post till date, sort by creation date.-->
+{% for comment in comments %}
+<h4>By {{ comment.name }} on {{ comment.created }}</h4>
+{{ comment.body | linebreaks }}
+{% empty %}
+<h4>There are no comments yet.</h4>
+{% endfor %}
+
+<!--Display 'comment has been added' or a new comment form based on what the user did regarding comments.-->
+{% if new_comment %}
+<h2>Your comment has been added.</h2>
+{% else %}
+<h2>Add a new comment</h2>
+<form method="post">
+    {{ comment_form.as_p }}
+    {% csrf_token %}
+    <p><input type="submit" value="Add a comment"></p>
+</form>
+{% endif %}
+
 {% endblock %}
