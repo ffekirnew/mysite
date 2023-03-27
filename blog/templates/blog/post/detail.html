@@ -9,7 +9,7 @@
     <p class="tags">Tags: {{ post.tags.all|join:", " }}</p>
 {% endif %}
 <!-- Display a link to share the post. -->
-<a href="{{ post.get_absolute_url }}share">Share the post.</a>
+<a href="{{ post.get_absolute_url }}share">Share this post by email.</a>
 {{ post.body|linebreaks }}
 
 <!--Display the number of comments for the specific post till date.-->
@@ -37,6 +37,15 @@
     {% csrf_token %}
     <p><input type="submit" value="Add a comment"></p>
 </form>
+{% endif %}
+
+<!--Display similar posts-->
+{% if similar_posts %}
+    <h2>Similar Posts</h2>
+    {% for similar_post in similar_posts %}
+        <a href="{{ similar_post.get_absolute_url }}">{{ similar_post.title }}</a>
+    {% endfor %}
+
 {% endif %}
 
 {% endblock %}
