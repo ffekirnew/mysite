@@ -1,51 +1,59 @@
 {% extends "blog/base.html" %}
+{% load blog_tags %}
 {% block title %}{{ post.title }}{% endblock %}
 {% block content %}
-<h1>{{ post.title }}</h1>
-<p class="date">
-    Published {{ post.publish }} by {{ post.author }}
-</p>
-{% if post.tags.all %}
-    <p class="tags">Tags: {{ post.tags.all|join:", " }}</p>
-{% endif %}
-<!-- Display a link to share the post. -->
-<a href="{{ post.get_absolute_url }}share">Share this post by email.</a>
-{{ post.body|linebreaks }}
-
-<!--Display the number of comments for the specific post till date.-->
-{% with comments.count as total_comments %}
-<h2>
-    {{ total_comments }} comment{{ total_comments|pluralize }}
-</h2>
-{% endwith %}
-
-<!--Display comments for the specific blog post till date, sort by creation date.-->
-{% for comment in comments %}
-<h4>By {{ comment.name }} on {{ comment.created }}</h4>
-{{ comment.body | linebreaks }}
-{% empty %}
-<h4>There are no comments yet.</h4>
-{% endfor %}
-
-<!--Display 'comment has been added' or a new comment form based on what the user did regarding comments.-->
-{% if new_comment %}
-<h2>Your comment has been added.</h2>
-{% else %}
-<h2>Add a new comment</h2>
-<form method="post">
-    {{ comment_form.as_p }}
-    {% csrf_token %}
-    <p><input type="submit" value="Add a comment"></p>
-</form>
-{% endif %}
-
-<!--Display similar posts-->
-{% if similar_posts %}
+<div class="p-5">
+    <h1 class="text-gray-800 text-4xl my-5">{{ post.title }}</h1>
+    <p class="date">
+        Published {{ post.publish }} by {{ post.author }}
+    </p>
+    {% if post.tags.all %}
+    <p>Tags:
+        {% for tag in post.tags.all %}
+        <a href="{% url 'blog:post_list_by_tag' tag.slug %}">{{ tag.name }}</a>
+        {% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </p>
+    {% endif %}
+    <!-- Display a link to share the post. -->
+    <a href="{{ post.get_absolute_url }}share">Share this post by email.</a>
+    {{ post.body|markdown }}
+    
+    <!--Display the number of comments for the specific post till date.-->
+    {% with comments.count as total_comments %}
+    <h2>
+        {{ total_comments }} comment{{ total_comments|pluralize }}
+    </h2>
+    {% endwith %}
+    
+    <!--Display comments for the specific blog post till date, sort by creation date.-->
+    {% for comment in comments %}
+    <h4>By {{ comment.name }} on {{ comment.created }}</h4>
+    {{ comment.body | linebreaks }}
+    {% empty %}
+    <h4>There are no comments yet.</h4>
+    {% endfor %}
+    
+    <!--Display 'comment has been added' or a new comment form based on what the user did regarding comments.-->
+    {% if new_comment %}
+    <h2>Your comment has been added.</h2>
+    {% else %}
+    <h2>Add a new comment</h2>
+    <form method="post">
+        {{ comment_form.as_p }}
+        {% csrf_token %}
+        <p><input type="submit" value="Add a comment"></p>
+    </form>
+    {% endif %}
+    
+    <!--Display similar posts-->
+    {% if similar_posts %}
     <h2>Similar Posts</h2>
     {% for similar_post in similar_posts %}
-        <a href="{{ similar_post.get_absolute_url }}">{{ similar_post.title }}</a>
+    <a href="{{ similar_post.get_absolute_url }}">{{ similar_post.title }}</a>
     {% endfor %}
-
-{% endif %}
+    
+    {% endif %}
+</div>
 
 {% endblock %}
